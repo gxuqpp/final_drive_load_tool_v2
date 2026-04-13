@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>主减速器计算载荷工具 · 式(5-5~5-8) · 《汽车设计》第6版</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1a5fa8;--blue2:#2e7dd1;--blue-lt:#b8d0ec;
+  --green:#1a7a3c;--green-lt:#a8d8bc;
+  --red:#c0392b;--red-lt:#f0b0a8;
+  --orange:#c55a11;--orange-lt:#e8c098;
+  --amber:#b8860b;--amber-lt:#e0c870;
+  --purple:#6b21a8;--purple-lt:#c8a8e8;
+  --teal:#0e7490;--teal-lt:#90ccd8;
+  --g1:#0e1c28;--g2:#253545;--g3:#3e5468;--g4:#607080;
+  --g5:#a8b8c8;--g6:#bccad4;--g7:#c8d4dc;
+  --bg:#9caab8;--card:#d0dae4;--r:10px;--sh:0 2px 14px rgba(0,0,0,.14)
+}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);
+  color:var(--g1);min-height:100vh;padding:14px 10px 40px;font-size:19px;line-height:1.65}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* ── Header ── */
+.hdr{background:linear-gradient(135deg,#0f2236 0%,#1a5fa8 100%);color:#fff;
+  border-radius:var(--r);padding:18px 20px 14px;margin-bottom:14px;box-shadow:var(--sh)}
+.hdr h1{font-size:24px;font-weight:700;margin-bottom:4px;line-height:1.35}
+.hdr p{font-size:17px;opacity:.90;line-height:1.5}
+.hdr .tag{display:inline-block;background:rgba(255,255,255,.22);border-radius:4px;
+  padding:3px 10px;font-size:15px;margin-top:6px;margin-right:5px}
+
+/* ── 公式说明区（4列→2列→1列）── */
+.fstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:860px){.fstrip{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.fstrip{grid-template-columns:1fr}}
+.fcard{background:var(--card);border-radius:var(--r);padding:13px 14px;
+  box-shadow:var(--sh);border-top:5px solid var(--blue)}
+.fcard.f2{border-top-color:var(--orange)}
+.fcard.f3{border-top-color:var(--teal)}
+.fcard.f4{border-top-color:var(--purple)}
+.fcard h4{font-size:17px;font-weight:700;margin-bottom:7px;line-height:1.4}
+.fcard h4 span{display:inline-block;border-radius:4px;padding:2px 8px;font-size:15px;
+  color:#fff;margin-right:5px}
+.fc1 h4 span{background:var(--blue)}
+.fc2 h4 span{background:var(--orange)}
+.fc3 h4 span{background:var(--teal)}
+.fc4 h4 span{background:var(--purple)}
+.feq{font-size:17px;font-weight:700;text-align:center;padding:5px 0;line-height:2.2;color:var(--g1)}
+.fdesc{font-size:15px;color:var(--g2);margin-top:7px;padding-top:7px;border-top:1.5px solid var(--g6);line-height:1.6}
+
+/* ── 齿轮类型切换 ── */
+.type-row{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.type-label{font-size:18px;font-weight:700;color:var(--g2);margin-right:4px}
+.type-btn{padding:9px 22px;border-radius:9px;border:2px solid var(--g5);
+  background:var(--g7);color:var(--g2);font-size:18px;font-weight:700;
+  cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px;min-height:48px}
+.type-btn.active.spiral{border-color:var(--blue);background:var(--blue);color:#fff}
+.type-btn.active.hypoid{border-color:var(--orange);background:var(--orange);color:#fff}
+.type-note{font-size:16px;color:var(--g2);padding:6px 13px;background:var(--g7);
+  border-radius:7px;border:1.5px solid var(--g5);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.eta-badge{display:inline-block;padding:3px 11px;border-radius:12px;font-weight:700;
+  font-size:15px;color:#fff;background:var(--blue)}
+
+/* ── 主布局（桌面双列，手机单列）── */
+.cols{display:grid;grid-template-columns:380px 1fr;gap:13px;margin-bottom:13px}
+@media(max-width:860px){.cols{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.card-h{font-size:19px;font-weight:700;color:var(--g1);margin-bottom:13px;
+  padding-bottom:8px;border-bottom:2.5px solid var(--blue-lt);display:flex;align-items:center;gap:7px}
+.icon-n{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.grp{font-size:16px;font-weight:700;color:var(--g2);letter-spacing:.05em;
+  margin:15px 0 9px;padding-top:11px;border-top:1.5px dashed var(--g5)}
+.grp:first-child{margin-top:0;padding-top:0;border-top:none}
+
+/* ── 参数行 ── */
+.pr{margin-bottom:14px}.pr:last-child{margin-bottom:0}
+.pl{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;gap:8px;flex-wrap:wrap}
+.pname{font-size:17px;color:var(--g1);font-weight:700;flex:1;min-width:0;line-height:1.4}
+.pval{font-size:20px;font-weight:700;color:var(--blue);flex-shrink:0}
+.punit{font-size:15px;color:var(--g3);margin-left:2px}
+.pval.c2{color:var(--orange)}
+.pval.c3{color:var(--teal)}
+.pval.c4{color:var(--purple)}
+/* 滑块 — 加高方便手指触控 */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;
+  background:var(--g5);border-radius:4px;outline:none;cursor:pointer;margin:4px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:22px;height:22px;border-radius:50%;background:var(--blue);border:3px solid #fff;
+  box-shadow:0 1px 5px rgba(0,0,0,.25);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.stk{display:flex;justify-content:space-between;font-size:14px;color:var(--g3);margin-top:2px}
+.pd{font-size:15px;color:var(--g3);margin-top:3px;line-height:1.5}
+.hide{display:none!important}
+
+/* ── 结果面板 ── */
+.rpanel{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:13px}
+.rh{background:linear-gradient(90deg,#0f2236,#1a5fa8);color:#fff;
+  padding:13px 18px;font-size:19px;font-weight:700;display:flex;align-items:center;gap:8px}
+.rb{padding:15px 16px}
+
+/* ── 结果卡片（3列→1列）── */
+.load-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.load-grid-2{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+@media(max-width:640px){.load-grid{grid-template-columns:1fr}}
+.load-card{border-radius:9px;padding:14px 13px;text-align:center;position:relative}
+.load-card.lc1{background:var(--blue-lt);border:2px solid var(--blue2)}
+.load-card.lc2{background:var(--orange-lt);border:2px solid var(--orange)}
+.load-card.lc3{background:var(--teal-lt);border:2px solid var(--teal)}
+.load-card.lc4{background:var(--purple-lt);border:2px solid var(--purple)}
+.load-card .lt{font-size:15px;font-weight:700;margin-bottom:7px;color:var(--g1);line-height:1.5}
+.load-card .lv{font-size:34px;font-weight:700;line-height:1}
+.load-card.lc1 .lv{color:var(--blue)}
+.load-card.lc2 .lv{color:var(--orange)}
+.load-card.lc3 .lv{color:var(--teal)}
+.load-card.lc4 .lv{color:var(--purple)}
+.load-card .lu{font-size:15px;color:var(--g3);margin-top:4px;font-weight:600}
+.load-card .badge{position:absolute;top:-8px;right:8px;font-size:14px;font-weight:700;
+  padding:3px 9px;border-radius:10px;color:#fff}
+.b-min{background:var(--green)}
+.b-des{background:var(--red)}
+
+/* ── 主动轮卡片（flex，手机变列）── */
+.pinion-card{background:linear-gradient(135deg,var(--purple-lt),#d0c0f0);
+  border:2.5px solid var(--purple);border-radius:9px;padding:14px 16px;
+  margin-bottom:14px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.pinion-card .pi-icon{font-size:36px;flex-shrink:0}
+.pinion-card .pi-body{flex:1;min-width:180px}
+.pinion-card .pi-title{font-size:17px;font-weight:700;color:var(--g1);margin-bottom:5px;line-height:1.4}
+.pinion-card .pi-val{font-size:34px;font-weight:700;color:var(--purple);line-height:1}
+.pinion-card .pi-sub{font-size:16px;color:var(--g2);margin-top:5px}
+.pinion-card .pi-tag{display:inline-block;font-size:15px;font-weight:700;
+  padding:3px 10px;border-radius:10px;background:var(--purple);color:#fff;margin-left:7px}
+
+/* ── 设计载荷高亮（flex，手机友好）── */
+.des-load{background:linear-gradient(135deg,var(--green-lt),#c0e8cc);
+  border:2.5px solid var(--green);border-radius:9px;padding:14px 16px;
+  margin-bottom:14px;display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.des-load .dl-icon{font-size:36px;flex-shrink:0}
+.des-load .dl-text{flex:1;min-width:180px}
+.des-load .dl-text b{font-size:24px;color:var(--green)}
+.des-load .dl-text p{font-size:17px;color:var(--g1);margin-top:4px;line-height:1.5}
+
+/* ── 柱状图对比 ── */
+.bar-section{margin-bottom:14px}
+.bar-section h4{font-size:18px;font-weight:700;color:var(--g1);margin-bottom:11px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.bar-name{width:90px;font-size:16px;color:var(--g2);text-align:right;flex-shrink:0;font-weight:600}
+.bar-track{flex:1;height:24px;background:var(--g6);border-radius:12px;overflow:hidden}
+.bar-fill{height:100%;border-radius:12px;display:flex;align-items:center;justify-content:flex-end;
+  padding-right:9px;font-size:15px;font-weight:700;color:#fff;transition:width .4s ease;white-space:nowrap}
+.bar-val{width:86px;font-size:17px;font-weight:700;flex-shrink:0}
+
+/* ── 推导过程 ── */
+.proc{background:var(--g7);border-radius:9px;padding:13px 15px;font-size:17px}
+.proc .ph{font-weight:700;color:var(--g1);margin-bottom:9px;font-size:18px}
+.proc-tabs{display:flex;gap:5px;margin-bottom:11px;flex-wrap:wrap}
+.proc-tab{padding:6px 13px;font-size:16px;border-radius:6px;cursor:pointer;
+  font-weight:700;border:1.5px solid var(--g5);background:var(--g6);color:var(--g2);transition:.15s;min-height:40px}
+.proc-tab.active.t1{border-color:var(--blue);background:var(--blue);color:#fff}
+.proc-tab.active.t2{border-color:var(--orange);background:var(--orange);color:#fff}
+.proc-tab.active.t3{border-color:var(--teal);background:var(--teal);color:#fff}
+.proc-tab.active.t4{border-color:var(--purple);background:var(--purple);color:#fff}
+.proc-g{display:grid;grid-template-columns:1fr auto;gap:4px 13px;align-items:baseline}
+.proc-g .eq{color:var(--g1);font-size:16px;line-height:1.7}
+.proc-g .rv{text-align:right;font-weight:700;font-size:17px}
+.rv.rc1{color:var(--blue)}.rv.rc2{color:var(--orange)}.rv.rc3{color:var(--teal)}.rv.rc4{color:var(--purple)}
+.rv.rhl{color:var(--green);font-size:18px}
+.rv.rdim{color:var(--red);font-size:18px}
+
+/* ── 灵敏度图 ── */
+.chart-card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--sh);margin-bottom:13px}
+.chart-card h3{font-size:19px;font-weight:700;color:var(--g1);margin-bottom:11px;
+  padding-bottom:8px;border-bottom:2.5px solid var(--blue-lt)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.tab{padding:7px 13px;font-size:16px;border-radius:7px 7px 0 0;cursor:pointer;
+  border:1.5px solid var(--g5);background:var(--g7);color:var(--g2);
+  font-weight:700;border-bottom:none;transition:.15s;min-height:42px}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+canvas{display:block;width:100%!important}
+.cnote{text-align:center;font-size:15px;color:var(--g3);margin-top:7px}
+
+/* ── 对比表 ── */
+.tbl{width:100%;border-collapse:collapse;font-size:16px}
+.tbl th{background:var(--blue);color:#fff;padding:9px 8px;text-align:center;font-weight:700}
+.tbl td{padding:8px 8px;border-bottom:1.5px solid var(--g6);text-align:center}
+.tbl tr:nth-child(even) td{background:var(--g7)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td.t1{color:var(--blue);font-weight:700}
+.tbl td.t2{color:var(--orange);font-weight:700}
+.tbl td.t3{color:var(--teal);font-weight:700}
+.tbl td.t4{color:var(--purple);font-weight:700}
+.tbl td.tdes{color:var(--green);font-weight:700;background:#98c8a8!important}
+.tbl td.cur{background:#d0c890!important;font-weight:700}
+
+/* ── 提示栏 ── */
+.alert{border-radius:9px;padding:12px 16px;font-size:17px;margin-bottom:13px;line-height:1.65}
+.alert.info{background:var(--blue-lt);border:1.5px solid #80a8d0;color:#0e1c38}
+.footer{text-align:center;font-size:15px;color:var(--g3);margin-top:9px;
+  padding-top:10px;border-top:1.5px solid var(--g5)}
+
+/* ── 数字输入框 ── */
+input.num-inp{
+  width:92px;border:2px solid var(--g5);border-radius:7px;
+  padding:3px 7px;font-size:20px;font-weight:700;color:var(--blue);
+  text-align:right;background:transparent;outline:none;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+}
+input.num-inp:focus{border-color:var(--blue);background:#cce0f5}
+input.num-inp.c2{color:var(--orange)}
+input.num-inp.c2:focus{border-color:var(--orange);background:#f0d8b8}
+input.num-inp.c3{color:var(--teal)}
+input.num-inp.c3:focus{border-color:var(--teal);background:#90d8e8}
+input.num-inp.c4{color:var(--purple)}
+input.num-inp.c4:focus{border-color:var(--purple);background:#c8a8e8}
+
+/* ══════════════════════════════════════════
+   手机端专项适配（≤ 760px）
+══════════════════════════════════════════ */
+@media(max-width:760px){
+  body{font-size:17px;padding:10px 8px 36px}
+  .hdr{padding:14px 14px 12px}
+  .hdr h1{font-size:20px}
+  .hdr p{font-size:15px}
+  .hdr .tag{font-size:14px;padding:2px 8px}
+
+  .fcard h4{font-size:16px}
+  .feq{font-size:15px}
+  .fdesc{font-size:14px}
+
+  .type-btn{font-size:16px;padding:8px 14px}
+  .type-note{font-size:15px}
+
+  .card{padding:13px 12px}
+  .card-h{font-size:17px}
+  .grp{font-size:15px}
+  .pname{font-size:16px}
+  .pval{font-size:19px}
+  .pd{font-size:14px}
+  .stk{font-size:13px}
+
+  .rh{font-size:17px;padding:11px 14px}
+  .rb{padding:13px 12px}
+
+  .load-card .lt{font-size:14px}
+  .load-card .lv{font-size:28px}
+  .load-card .lu{font-size:14px}
+
+  /* 主动轮卡片: 不换行，保持横排，但缩小 */
+  .pinion-card .pi-title{font-size:15px}
+  .pinion-card .pi-val{font-size:28px}
+  .pinion-card .pi-sub{font-size:14px}
+
+  .des-load .dl-text b{font-size:20px}
+  .des-load .dl-text p{font-size:15px}
+
+  .bar-name{width:74px;font-size:14px}
+  .bar-fill{font-size:13px}
+  .bar-val{font-size:15px;width:68px}
+
+  .proc{font-size:16px;padding:11px 12px}
+  .proc .ph{font-size:17px}
+  .proc-tab{font-size:14px;padding:5px 9px}
+  .proc-g .eq{font-size:15px}
+  .proc-g .rv{font-size:16px}
+
+  .chart-card h3{font-size:17px}
+  .tab{font-size:14px;padding:6px 9px}
+
+  .tbl{font-size:14px}
+  .tbl th{padding:7px 5px;font-size:13px}
+  .tbl td{padding:6px 5px}
+
+  .alert{font-size:16px;padding:10px 13px}
+}
+user-select: none
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Header -->
+<div class="hdr">
+  <h1>⚙️ 主减速器计算载荷确定工具</h1>
+  <p>基于《汽车设计》第6版 第五章 · 式5-5（发动机起动）· 式5-6（打滑附着）· 式5-7（日常行驶）· 式5-8（主动锥齿轮）</p>
+  <span class="tag">离线版 · 无需联网</span>
+  <span class="tag">弧齿锥 / 双曲面 双模式</span>
+  <span class="tag">四类载荷实时联动</span>
+</div>
+
+<!-- Formula strip -->
+<div class="fstrip">
+  <div class="fcard fc1">
+    <h4><span>式5-5</span>从动锥齿轮（发动机起动）</h4>
+    <div class="feq">T<sub>ce</sub> = k<sub>d</sub>·k·T<sub>emax</sub>·i₁·i<sub>f</sub>·i₀·η / n</div>
+    <div class="fdesc">离合器突接动载；最低档/分动器传动比；静强度校核用载荷</div>
+  </div>
+  <div class="fcard fc2 f2">
+    <h4><span>式5-6</span>从动锥齿轮（打滑附着）</h4>
+    <div class="feq">T<sub>cs</sub> = G₂·m₂'·φ·r<sub>r</sub> / (i<sub>m</sub>·η<sub>m</sub>)</div>
+    <div class="fdesc">满载驱动桥载荷 × 轴荷转移 × 附着系数；不含传动比 i₀</div>
+  </div>
+  <div class="fcard fc3 f3">
+    <h4><span>式5-7</span>从动锥齿轮（日常行驶）</h4>
+    <div class="feq">T<sub>cl</sub> = F<sub>t</sub>·r<sub>r</sub> / (i<sub>m</sub>·η<sub>m</sub>·n)</div>
+    <div class="fdesc">平均牵引力×滚动半径；疲劳寿命计算专用载荷</div>
+  </div>
+  <div class="fcard fc4 f4">
+    <h4><span>式5-8</span>主动锥齿轮（小齿轮）</h4>
+    <div class="feq">T<sub>c</sub> = T<sub>c,从</sub> / (i₀·η<sub>G</sub>)</div>
+    <div class="fdesc">由从动锥设计载荷反推；η<sub>G</sub> 与齿轮副类型及 i₀ 有关</div>
+  </div>
+</div>
+
+<!-- Gear type toggle -->
+<div class="type-row">
+  <span class="type-label">齿轮副类型：</span>
+  <button class="type-btn spiral active" id="btnSpiral" onclick="setGearType('spiral')">🔩 弧齿锥齿轮</button>
+  <button class="type-btn hypoid" id="btnHypoid" onclick="setGearType('hypoid')">⚙️ 双曲面齿轮</button>
+  <span class="type-note" id="gearNote">
+    弧齿锥：η<sub>G</sub> = 95%（式5-8 固定取值）&emsp;
+    <span class="eta-badge" id="etaBadge">η<sub>G</sub> = 0.95</span>
+  </span>
+</div>
+
+<!-- Info -->
+<div class="alert info">
+  <b>💡 使用说明：</b>
+  三种<b>从动锥齿轮</b>（大齿轮）计算载荷：
+  <b>T<sub>ce</sub>（式5-5）</b> 由发动机最大转矩经各级传动比放大，用于静强度；
+  <b>T<sub>cs</sub>（式5-6）</b> 由驱动轮附着力矩反算，用于静强度；
+  <b>T<sub>cl</sub>（式5-7）</b> 为日常平均牵引力对应转矩，用于疲劳寿命。
+  <b>静强度设计载荷</b>取 T<sub>c,从</sub> = min(T<sub>ce</sub>, T<sub>cs</sub>)。
+  <b>主动锥齿轮</b>（小齿轮）计算转矩 T<sub>c</sub>（式5-8）由 T<sub>c,从</sub>/(i₀·η<sub>G</sub>) 得到，
+  η<sub>G</sub> 弧齿锥取 95%，双曲面 i₀>6 取 85%、i₀≤6 取 90%。
+  平均牵引力 F<sub>t</sub> = m<sub>a</sub>·g·(f<sub>R</sub>+f<sub>H</sub>+f<sub>J</sub>)。
+</div>
+
+<!-- Main columns -->
+<div class="cols">
+
+  <!-- Left: Inputs -->
+  <div class="card">
+    <div class="card-h"><span class="icon-n">1</span>输入参数调节</div>
+
+    <div class="grp">▍ 动力系统参数（式5-5）</div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">发动机最大转矩 T<sub>emax</sub></span>
+        <span class="pval"><input type="number" class="num-inp" id="v_Te" value="400" step="10" min="0" oninput="syncNum('Te',this.value)"><span class="punit">N·m</span></span>
+      </div>
+      <input type="range" id="s_Te" min="50" max="1200" step="10" value="400" oninput="sync('Te',this.value)">
+      <div class="stk"><span>50</span><span>300</span><span>700</span><span>1200</span></div>
+      <div class="pd">乘用车 200~600 N·m，商用车/SUV 可达 1000 N·m+</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">最低档传动比 i<sub>1</sub></span>
+        <span class="pval"><input type="number" class="num-inp" id="v_i1" value="4.5" step="0.1" min="0" oninput="syncNum('i1',this.value)"></span>
+      </div>
+      <input type="range" id="s_i1" min="1.0" max="8.0" step="0.1" value="4.5" oninput="sync('i1',this.value)">
+      <div class="stk"><span>1.0</span><span>3.0</span><span>5.5</span><span>8.0</span></div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">分动器传动比 i<sub>f</sub></span>
+        <span class="pval"><input type="number" class="num-inp" id="v_if_" value="1.0" step="0.1" min="0" oninput="syncNum('if_',this.value)"></span>
+      </div>
+      <input type="range" id="s_if_" min="1.0" max="4.0" step="0.1" value="1.0" oninput="sync('if_',this.value)">
+      <div class="stk"><span>1.0</span><span>2.0</span><span>3.0</span><span>4.0</span></div>
+      <div class="pd">无分动器取 1.0；越野/4WD 典型值 2.0~3.0</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">主减速比 i₀</span>
+        <span class="pval"><input type="number" class="num-inp" id="v_i0" value="4.10" step="0.1" min="0.1" oninput="syncNum('i0',this.value)"></span>
+      </div>
+      <input type="range" id="s_i0" min="2.0" max="9.0" step="0.1" value="4.1" oninput="sync('i0',this.value)">
+      <div class="stk"><span>2.0</span><span>4.0</span><span>6.5</span><span>9.0</span></div>
+      <div class="pd">乘用车 3.5~5.0；商用车 5.0~9.0；i₀>6 时双曲面 η<sub>G</sub> 取 85%</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">传动效率 η（至从动锥）</span>
+        <span class="pval"><input type="number" class="num-inp" id="v_eta" value="0.90" step="0.01" min="0" oninput="syncNum('eta',this.value)"></span>
+      </div>
+      <input type="range" id="s_eta" min="0.70" max="0.98" step="0.01" value="0.90" oninput="sync('eta',this.value)">
+      <div class="stk"><span>0.70</span><span>0.85</span><span>0.95</span><span>0.98</span></div>
+      <div class="pd">变速器+传动轴到从动锥齿轮的综合传动效率，典型值 0.85~0.95</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">液力变矩器系数 k<sub>d</sub></span>
+        <span class="pval"><input type="number" class="num-inp" id="v_kd" value="2.0" step="0.1" min="0" oninput="syncNum('kd',this.value)"></span>
+      </div>
+      <input type="range" id="s_kd" min="1.0" max="4.0" step="0.1" value="2.0" oninput="sync('kd',this.value)">
+      <div class="stk"><span>1.0</span><span>2.0</span><span>3.0</span><span>4.0</span></div>
+      <div class="pd">MT 无变矩器 k<sub>d</sub>=1；AT 液力变矩器最大变矩比 2.0~3.0</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">离合器冲击系数 k</span>
+        <span class="pval"><input type="number" class="num-inp" id="v_k" value="1.0" step="0.1" min="0" oninput="syncNum('k',this.value)"></span>
+      </div>
+      <input type="range" id="s_k" min="1.0" max="2.0" step="0.1" value="1.0" oninput="sync('k',this.value)">
+      <div class="stk"><span>1.0（MT平顺）</span><span>1.5</span><span>2.0</span></div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">计算驱动桥数 n</span>
+        <span class="pval"><input type="number" class="num-inp" id="v_n" value="1" step="1" min="1" oninput="syncNum('n',this.value)"></span>
+      </div>
+      <input type="range" id="s_n" min="1" max="4" step="1" value="1" oninput="sync('n',this.value)">
+      <div class="stk"><span>1（4×2）</span><span>2（6×6）</span><span>3</span><span>4</span></div>
+    </div>
+
+    <div class="grp">▍ 整车 &amp; 轴荷参数（式5-6）</div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">整车满载质量 m<sub>a</sub></span>
+        <span class="pval c2"><input type="number" class="num-inp c2" id="v_ma" value="1800" step="50" min="0" oninput="syncNum('ma',this.value)"><span class="punit">kg</span></span>
+      </div>
+      <input type="range" id="s_ma" min="500" max="8000" step="50" value="1800" oninput="sync('ma',this.value)">
+      <div class="stk"><span>500</span><span>2000</span><span>5000</span><span>8000</span></div>
+      <div class="pd">含乘员/货物满载质量；乘用车 1000~2500 kg，轻型货车 3000~8000 kg</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">驱动桥静载荷分配比 α₂</span>
+        <span class="pval c2"><input type="number" class="num-inp c2" id="v_alpha" value="0.55" step="0.01" min="0" oninput="syncNum('alpha',this.value)"></span>
+      </div>
+      <input type="range" id="s_alpha" min="0.30" max="0.80" step="0.01" value="0.55" oninput="sync('alpha',this.value)">
+      <div class="stk"><span>0.30</span><span>0.50</span><span>0.65</span><span>0.80</span></div>
+      <div class="pd">FR 后驱：后轴 0.50~0.65；FF 前驱：前轴 0.58~0.68；纯越野 0.50</div>
+    </div>
+
+    <!-- Derived G2 display -->
+    <div style="background:var(--orange-lt);border:1.5px solid var(--orange);border-radius:7px;padding:10px 13px;font-size:17px;margin-bottom:12px">
+      <span style="color:var(--g3)">G = m<sub>a</sub>×9.81 = </span><b id="dv_G" style="color:var(--blue)">—</b> N<br>
+      <span style="color:var(--g3)">G₂（驱动桥载荷）= G×α₂ = </span><b id="dv_G2" style="color:var(--orange)">—</b> N
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">轴荷转移系数 m<sub>2</sub>'</span>
+        <span class="pval c2"><input type="number" class="num-inp c2" id="v_m2" value="1.30" step="0.05" min="0" oninput="syncNum('m2',this.value)"></span>
+      </div>
+      <input type="range" id="s_m2" min="1.0" max="1.6" step="0.05" value="1.3" oninput="sync('m2',this.value)">
+      <div class="stk"><span>1.0</span><span>1.2</span><span>1.4</span><span>1.6</span></div>
+      <div class="pd">汽车加速度最大时后轴负荷转移系数；FR 取 1.2~1.4</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">路面附着系数 φ</span>
+        <span class="pval c2"><input type="number" class="num-inp c2" id="v_phi" value="0.85" step="0.05" min="0" oninput="syncNum('phi',this.value)"></span>
+      </div>
+      <input type="range" id="s_phi" min="0.3" max="1.0" step="0.05" value="0.85" oninput="sync('phi',this.value)">
+      <div class="stk"><span>0.3（冰）</span><span>0.6</span><span>0.85</span><span>1.0</span></div>
+      <div class="pd">干沥青 0.75~0.85；湿路 0.5~0.7；越野/泥 0.3~0.5</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">车轮滚动半径 r<sub>r</sub></span>
+        <span class="pval c2"><input type="number" class="num-inp c2" id="v_rr" value="0.380" step="0.005" min="0" oninput="syncNum('rr',this.value)"><span class="punit">m</span></span>
+      </div>
+      <input type="range" id="s_rr" min="0.25" max="0.60" step="0.005" value="0.38" oninput="sync('rr',this.value)">
+      <div class="stk"><span>0.25</span><span>0.38</span><span>0.50</span><span>0.60</span></div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">轮边减速比 i<sub>m</sub></span>
+        <span class="pval c2"><input type="number" class="num-inp c2" id="v_im" value="1.0" step="0.1" min="0.1" oninput="syncNum('im',this.value)"></span>
+      </div>
+      <input type="range" id="s_im" min="1.0" max="6.0" step="0.1" value="1.0" oninput="sync('im',this.value)">
+      <div class="stk"><span>1.0</span><span>2.0</span><span>4.0</span><span>6.0</span></div>
+      <div class="pd">乘用车/普通商用车取 1.0（无轮边减速）；重型越野车 2.0~6.0</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">从动轮到车轮传动效率 η<sub>m</sub></span>
+        <span class="pval c2"><input type="number" class="num-inp c2" id="v_etam" value="0.95" step="0.01" min="0" oninput="syncNum('etam',this.value)"></span>
+      </div>
+      <input type="range" id="s_etam" min="0.80" max="0.99" step="0.01" value="0.95" oninput="sync('etam',this.value)">
+      <div class="stk"><span>0.80</span><span>0.90</span><span>0.95</span><span>0.99</span></div>
+    </div>
+
+    <div class="grp">▍ 日常行驶参数（式5-7）— F<sub>t</sub>=m<sub>a</sub>·g·(f<sub>R</sub>+f<sub>H</sub>+f<sub>J</sub>)</div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">滚动阻力系数 f<sub>R</sub></span>
+        <span class="pval c3"><input type="number" class="num-inp c3" id="v_fR" value="0.012" step="0.001" min="0" oninput="syncNum('fR',this.value)"></span>
+      </div>
+      <input type="range" id="s_fR" min="0.005" max="0.04" step="0.001" value="0.012" oninput="sync('fR',this.value)">
+      <div class="stk"><span>0.005</span><span>0.015</span><span>0.030</span><span>0.040</span></div>
+      <div class="pd">沥青路面 0.010~0.015；越野土路 0.020~0.035</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">爬坡阻力 f<sub>H</sub> (sinθ)</span>
+        <span class="pval c3"><input type="number" class="num-inp c3" id="v_fH" value="0.080" step="0.005" min="0" oninput="syncNum('fH',this.value)"></span>
+      </div>
+      <input type="range" id="s_fH" min="0.00" max="0.30" step="0.005" value="0.08" oninput="sync('fH',this.value)">
+      <div class="stk"><span>0</span><span>0.08</span><span>0.18</span><span>0.30</span></div>
+      <div class="pd">日常行驶平均坡度；乘用车约 0.04~0.10，越野车 0.15~0.30</div>
+    </div>
+
+    <div class="pr">
+      <div class="pl">
+        <span class="pname">性能系数 f<sub>J</sub>（加速惯量）</span>
+        <span class="pval c3"><input type="number" class="num-inp c3" id="v_fJ" value="0.030" step="0.005" min="0" oninput="syncNum('fJ',this.value)"></span>
+      </div>
+      <input type="range" id="s_fJ" min="0.00" max="0.15" step="0.005" value="0.03" oninput="sync('fJ',this.value)">
+      <div class="stk"><span>0</span><span>0.04</span><span>0.09</span><span>0.15</span></div>
+      <div class="pd">乘用车 0.02~0.05；越野/商用车 0.06~0.10</div>
+    </div>
+
+    <!-- Derived Ft display -->
+    <div style="background:var(--teal-lt);border:1.5px solid var(--teal);border-radius:7px;padding:10px 13px;font-size:17px;margin-bottom:0">
+      <b style="color:var(--teal)">平均牵引力计算：</b><br>
+      <span style="color:var(--g3)">F<sub>t</sub> = m<sub>a</sub>×g×(f<sub>R</sub>+f<sub>H</sub>+f<sub>J</sub>) = <span id="dv_Ft_expr">—</span></span><br>
+      <b style="color:var(--teal)">F<sub>t</sub> = <span id="dv_Ft">—</span> N</b>
+    </div>
+  </div>
+
+  <!-- Right: Results -->
+  <div>
+    <div class="rpanel">
+      <div class="rh">📊 四类计算载荷实时结果</div>
+      <div class="rb">
+
+        <!-- Three driven gear load cards -->
+        <div style="font-size:17px;font-weight:700;color:var(--g2);margin-bottom:8px;letter-spacing:.03em">
+          ▍ 从动锥齿轮（大齿轮）计算转矩
+        </div>
+        <div class="load-grid">
+          <div class="load-card lc1">
+            <div class="lt">① 发动机起动转矩 T<sub>ce</sub>（式5-5）</div>
+            <div class="lv" id="r_Tce">—</div>
+            <div class="lu">N·m</div>
+            <div class="badge" id="badge_Tce"></div>
+          </div>
+          <div class="load-card lc2">
+            <div class="lt">② 打滑附着转矩 T<sub>cs</sub>（式5-6）</div>
+            <div class="lv" id="r_Tcs">—</div>
+            <div class="lu">N·m</div>
+            <div class="badge" id="badge_Tcs"></div>
+          </div>
+          <div class="load-card lc3">
+            <div class="lt">③ 日常行驶转矩 T<sub>cl</sub>（式5-7）</div>
+            <div class="lv" id="r_Tcl">—</div>
+            <div class="lu">N·m（疲劳用）</div>
+          </div>
+        </div>
+
+        <!-- Design load highlight -->
+        <div class="des-load">
+          <div class="dl-icon">🎯</div>
+          <div class="dl-text">
+            <div>从动锥齿轮设计载荷（静强度）：<b id="r_TcDriven">—</b> N·m</div>
+            <p id="r_TcDriven_desc">T<sub>c,从</sub> = min(T<sub>ce</sub>, T<sub>cs</sub>) = —</p>
+            <div style="margin-top:5px;font-size:17px;color:var(--teal)">
+              疲劳寿命计算用：T<sub>cl</sub> = <b id="r_Tcl2">—</b> N·m（日常行驶平均转矩）
+            </div>
+          </div>
+        </div>
+
+        <!-- Pinion result card -->
+        <div style="font-size:17px;font-weight:700;color:var(--g2);margin-bottom:8px;letter-spacing:.03em">
+          ▍ 主动锥齿轮（小齿轮）计算转矩（式5-8）
+        </div>
+        <div class="pinion-card">
+          <div class="pi-icon">🔩</div>
+          <div class="pi-body">
+            <div class="pi-title">
+              T<sub>c</sub> = T<sub>c,从</sub> / (i₀ · η<sub>G</sub>)
+              <span class="pi-tag" id="etaG_badge">η<sub>G</sub>=0.95</span>
+            </div>
+            <div class="pi-val" id="r_Tc">—</div>
+            <div class="pi-sub">N·m &emsp;
+              <span id="r_Tc_expr" style="color:var(--g4);font-size:15px">—</span>
+            </div>
+          </div>
+          <div style="text-align:center;flex-shrink:0;min-width:90px">
+            <div style="font-size:16px;color:var(--g3);margin-bottom:4px">η<sub>G</sub> 取值依据</div>
+            <div id="etaG_rule" style="font-size:16px;color:var(--purple);font-weight:700;line-height:1.6">—</div>
+          </div>
+        </div>
+
+        <!-- Bar chart -->
+        <div class="bar-section">
+          <h4>各计算载荷大小对比</h4>
+          <div class="bar-row">
+            <div class="bar-name">T<sub>ce</sub></div>
+            <div class="bar-track"><div class="bar-fill" id="bar_Tce" style="background:#1a5fa8"></div></div>
+            <div class="bar-val" id="bv_Tce" style="color:var(--blue)">—</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">T<sub>cs</sub></div>
+            <div class="bar-track"><div class="bar-fill" id="bar_Tcs" style="background:#c55a11"></div></div>
+            <div class="bar-val" id="bv_Tcs" style="color:var(--orange)">—</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">T<sub>cl</sub></div>
+            <div class="bar-track"><div class="bar-fill" id="bar_Tcl" style="background:#0e7490"></div></div>
+            <div class="bar-val" id="bv_Tcl" style="color:var(--teal)">—</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name" style="color:var(--green);font-weight:700">T<sub>c,从</sub>(静)</div>
+            <div class="bar-track"><div class="bar-fill" id="bar_TcD" style="background:var(--green)"></div></div>
+            <div class="bar-val" id="bv_TcD" style="color:var(--green)">—</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name" style="color:var(--purple);font-weight:700">T<sub>c</sub>(主动)</div>
+            <div class="bar-track"><div class="bar-fill" id="bar_Tc" style="background:var(--purple)"></div></div>
+            <div class="bar-val" id="bv_Tc" style="color:var(--purple)">—</div>
+          </div>
+        </div>
+
+        <!-- Step-by-step derivation -->
+        <div class="proc">
+          <div class="ph">逐步推导过程</div>
+          <div class="proc-tabs">
+            <div class="proc-tab t1 active" onclick="switchProc(0)">① T<sub>ce</sub> 推导</div>
+            <div class="proc-tab t2" onclick="switchProc(1)">② T<sub>cs</sub> 推导</div>
+            <div class="proc-tab t3" onclick="switchProc(2)">③ T<sub>cl</sub> 推导</div>
+            <div class="proc-tab t4" onclick="switchProc(3)">④ T<sub>c</sub> 主动轮</div>
+          </div>
+          <div class="proc-g" id="proc_body"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sensitivity chart -->
+<div class="chart-card">
+  <h3>📈 单参数对各类计算载荷的影响规律</h3>
+  <div class="tabs" id="tabRow"></div>
+  <canvas id="mainChart" height="290"></canvas>
+  <div class="cnote" id="chartNote"></div>
+</div>
+
+<!-- Comparison table -->
+<div class="card" style="margin-bottom:13px">
+  <div class="card-h"><span class="icon-n">2</span>典型参数方案对比表</div>
+  <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>方案</th><th>车型</th><th>i₁</th><th>i₀</th><th>φ</th>
+          <th>T<sub>ce</sub> (N·m)</th>
+          <th>T<sub>cs</sub> (N·m)</th>
+          <th>T<sub>cl</sub> (N·m)</th>
+          <th>T<sub>c,从</sub>=min (N·m)</th>
+          <th>T<sub>c</sub> 主动轮</th>
+          <th>控制工况</th>
+        </tr>
+      </thead>
+      <tbody id="cmpBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  《汽车设计》第6版 · 第五章 主减速器设计<br>
+  式5-5（T<sub>ce</sub>：发动机起动转矩）· 式5-6（T<sub>cs</sub>：打滑附着转矩）· 式5-7（T<sub>cl</sub>：日常行驶平均转矩）· 式5-8（T<sub>c</sub>：主动锥齿轮）<br>
+  弧齿锥：η<sub>G</sub>=95%；双曲面：i₀>6 → η<sub>G</sub>=85%，i₀≤6 → η<sub>G</sub>=90%<br>
+  静强度设计载荷：T<sub>c,从</sub> = min(T<sub>ce</sub>, T<sub>cs</sub>)；疲劳寿命：T<sub>cl</sub>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+var gearType = 'spiral'; // 'spiral' | 'hypoid'
+var G_GRAV   = 9.81;
+var P = {
+  Te:400, i1:4.5, if_:1.0, i0:4.1, eta:0.90, kd:2.0, k:1.0, n:1,
+  ma:1800, alpha:0.55, m2:1.30, phi:0.85, rr:0.380,
+  im:1.0,  etam:0.95,
+  fR:0.012, fH:0.080, fJ:0.030
+};
+var TAB = 0, PROC = 0;
+
+// ── Sync sliders and number inputs ─────────────────────────────────────────
+function sync(k, v) {
+  var val = parseFloat(v);
+  if (isNaN(val)) return;
+  P[k] = val;
+  var ni = document.getElementById('v_' + k);
+  if (ni) ni.value = formatVal(k, val);
+  compute();
+}
+function syncNum(k, v) {
+  var val = parseFloat(v);
+  if (isNaN(val)) return;
+  P[k] = val;
+  var si = document.getElementById('s_' + k);
+  if (!si) {
+    // try alternate ID for sliders named differently
+    si = document.getElementById('s_' + k.replace('_',''));
+    if (!si) si = document.getElementById('s_if_');
+  }
+  if (si) si.value = val;
+  compute();
+}
+function formatVal(k, v) {
+  var dec = {Te:0, i1:1, if_:1, i0:2, eta:2, kd:1, k:1, n:0,
+             ma:0, alpha:2, m2:2, phi:2, rr:3,
+             im:1, etam:2, fR:3, fH:3, fJ:3};
+  return v.toFixed(dec[k] !== undefined ? dec[k] : 2);
+}
+function setVal(id, v) {
+  var el = document.getElementById(id);
+  if (el) el.value = v;
+}
+
+// ── Gear type ──────────────────────────────────────────────────────────────
+function setGearType(t) {
+  gearType = t;
+  var isSp = (t === 'spiral');
+  document.getElementById('btnSpiral').className = 'type-btn spiral' + (isSp  ? ' active' : '');
+  document.getElementById('btnHypoid').className = 'type-btn hypoid' + (!isSp ? ' active' : '');
+  var etaG = getEtaG(P.i0, t);
+  updateGearNote(t, etaG);
+  compute();
+}
+
+function getEtaG(i0, gt) {
+  if (gt === 'spiral') return 0.95;
+  return (i0 > 6) ? 0.85 : 0.90;
+}
+
+function updateGearNote(t, etaG) {
+  var badge = document.getElementById('etaBadge');
+  var note  = document.getElementById('gearNote');
+  if (t === 'spiral') {
+    badge.textContent = 'ηG = 0.95';
+    badge.style.background = 'var(--blue)';
+    note.innerHTML = '弧齿锥齿轮副：η<sub>G</sub> = 95%（式5-8 固定取值）&emsp;<span class="eta-badge" id="etaBadge" style="background:var(--blue)">η<sub>G</sub> = 0.95</span>';
+  } else {
+    var col = (P.i0 > 6) ? 'var(--red)' : 'var(--orange)';
+    var txt = (P.i0 > 6) ? 'ηG = 0.85（i₀>6）' : 'ηG = 0.90（i₀≤6）';
+    note.innerHTML = '双曲面齿轮副：i₀&gt;6 → η<sub>G</sub>=85%；i₀≤6 → η<sub>G</sub>=90%&emsp;<span class="eta-badge" id="etaBadge" style="background:'+col+'">'+txt+'</span>';
+  }
+}
+
+// ── Core calculation ───────────────────────────────────────────────────────
+function calcAll(p, gt) {
+  var G   = p.ma * G_GRAV;
+  var G2  = G * p.alpha;
+  var Ft  = G * (p.fR + p.fH + p.fJ);
+
+  // 式5-5: 从动锥 by engine startup
+  var Tce = (p.kd * p.k * p.Te * p.i1 * p.if_ * p.i0 * p.eta) / p.n;
+
+  // 式5-6: 从动锥 by wheel slip
+  var Tcs = (G2 * p.m2 * p.phi * p.rr) / (p.im * p.etam);
+
+  // 式5-7: 从动锥 daily average
+  var Tcl = (Ft * p.rr) / (p.im * p.etam * p.n);
+
+  // Design load for driven gear (static)
+  var TcD = Math.min(Tce, Tcs);
+
+  // 式5-8: 主动锥 pinion
+  var etaG = getEtaG(p.i0, gt);
+  var Tc   = TcD / (p.i0 * etaG);
+
+  return { G:G, G2:G2, Ft:Ft, Tce:Tce, Tcs:Tcs, Tcl:Tcl, TcD:TcD, Tc:Tc, etaG:etaG };
+}
+
+// ── UI update ──────────────────────────────────────────────────────────────
+function compute() {
+  var r = calcAll(P, gearType);
+
+  // Update gear note (i0-dependent for hypoid)
+  updateGearNote(gearType, r.etaG);
+
+  // Derived displays
+  document.getElementById('dv_G').textContent  = r.G.toFixed(0);
+  document.getElementById('dv_G2').textContent = r.G2.toFixed(0);
+  var ftExpr = P.ma.toFixed(0)+'×9.81×('
+    +P.fR.toFixed(3)+'+'+P.fH.toFixed(3)+'+'+P.fJ.toFixed(3)+')';
+  document.getElementById('dv_Ft_expr').textContent = ftExpr;
+  document.getElementById('dv_Ft').textContent = r.Ft.toFixed(0);
+
+  // Result cards
+  document.getElementById('r_Tce').textContent = r.Tce.toFixed(0);
+  document.getElementById('r_Tcs').textContent = r.Tcs.toFixed(0);
+  document.getElementById('r_Tcl').textContent = r.Tcl.toFixed(0);
+  document.getElementById('r_Tcl2').textContent= r.Tcl.toFixed(0);
+  document.getElementById('r_Tc').textContent  = r.Tc.toFixed(0);
+
+  // Badges
+  var bCe = document.getElementById('badge_Tce');
+  var bCs = document.getElementById('badge_Tcs');
+  if (r.Tce <= r.Tcs) {
+    bCe.textContent='控制工况'; bCe.className='badge b-des';
+    bCs.textContent=''; bCs.className='badge';
+  } else {
+    bCs.textContent='控制工况'; bCs.className='badge b-des';
+    bCe.textContent=''; bCe.className='badge';
+  }
+
+  // Design load
+  var ctrl = r.Tce <= r.Tcs ? 'T<sub>ce</sub>（发动机工况控制）' : 'T<sub>cs</sub>（附着工况控制）';
+  document.getElementById('r_TcDriven').textContent = r.TcD.toFixed(0);
+  document.getElementById('r_TcDriven_desc').innerHTML =
+    'T<sub>c,从</sub> = min(T<sub>ce</sub>, T<sub>cs</sub>) = min('
+    +r.Tce.toFixed(0)+', '+r.Tcs.toFixed(0)+') = <b>'+r.TcD.toFixed(0)+' N·m</b>，由 '+ctrl+' 决定';
+
+  // Pinion card
+  var etaGpct = (r.etaG * 100).toFixed(0) + '%';
+  document.getElementById('etaG_badge').innerHTML = 'η<sub>G</sub>=' + etaGpct;
+  document.getElementById('r_Tc_expr').textContent =
+    r.TcD.toFixed(0)+' / ('+P.i0.toFixed(2)+'×'+r.etaG.toFixed(2)+') = '+r.Tc.toFixed(0);
+  var ruleText = '';
+  if (gearType === 'spiral') {
+    ruleText = '弧齿锥齿轮副\nηG = 0.95（固定）';
+  } else {
+    ruleText = P.i0 > 6
+      ? '双曲面齿轮副\ni₀=' + P.i0.toFixed(2) + ' > 6\nηG = 0.85'
+      : '双曲面齿轮副\ni₀=' + P.i0.toFixed(2) + ' ≤ 6\nηG = 0.90';
+  }
+  document.getElementById('etaG_rule').innerHTML = ruleText.replace(/\n/g,'<br>');
+
+  // Bars
+  var maxVal = Math.max(r.Tce, r.Tcs, r.Tcl, r.TcD, r.Tc, 1);
+  function setBar(id, vid, val, lim) {
+    var pct = Math.min(val / lim * 100, 100);
+    document.getElementById(id).style.width = pct + '%';
+    document.getElementById(id).textContent = val >= lim * 0.12 ? val.toFixed(0) : '';
+    document.getElementById(vid).textContent = val.toFixed(0);
+  }
+  setBar('bar_Tce','bv_Tce', r.Tce, maxVal);
+  setBar('bar_Tcs','bv_Tcs', r.Tcs, maxVal);
+  setBar('bar_Tcl','bv_Tcl', r.Tcl, maxVal);
+  setBar('bar_TcD','bv_TcD', r.TcD, maxVal);
+  setBar('bar_Tc', 'bv_Tc',  r.Tc,  maxVal);
+
+  // Proc
+  renderProc(r);
+
+  // Chart
+  drawChart();
+
+  // Comparison table
+  renderTable();
+}
+
+// ── Step-by-step derivation ────────────────────────────────────────────────
+function switchProc(i) {
+  PROC = i;
+  document.querySelectorAll('.proc-tab').forEach(function(t, j) {
+    var cls = ['t1','t2','t3','t4'][j];
+    t.className = 'proc-tab ' + cls + (j === i ? ' active' : '');
+  });
+  var r = calcAll(P, gearType);
+  renderProc(r);
+}
+
+function renderProc(r) {
+  var html = '';
+  var p = P;
+  if (PROC === 0) {
+    // Tce derivation
+    html += row('k<sub>d</sub>（液力变矩器系数）', p.kd.toFixed(2), 'rc1');
+    html += row('k（离合器冲击系数）',            p.k.toFixed(2),  'rc1');
+    html += row('T<sub>emax</sub>（发动机最大转矩）', p.Te.toFixed(0)+' N·m', 'rc1');
+    html += row('i₁（最低档传动比）',             p.i1.toFixed(2), 'rc1');
+    html += row('i<sub>f</sub>（分动器传动比）',   p.if_.toFixed(2),'rc1');
+    html += row('i₀（主减速比）',                 p.i0.toFixed(2), 'rc1');
+    html += row('η（传动效率）',                  p.eta.toFixed(2),'rc1');
+    html += row('n（驱动桥数）',                  p.n,             'rc1');
+    html += rowSep();
+    html += row('T<sub>ce</sub> = k<sub>d</sub>·k·T<sub>emax</sub>·i₁·i<sub>f</sub>·i₀·η / n',
+      r.Tce.toFixed(0)+' N·m', 'rhl');
+  } else if (PROC === 1) {
+    // Tcs derivation
+    html += row('m<sub>a</sub>（满载质量）',       p.ma.toFixed(0)+' kg', 'rc2');
+    html += row('G = m<sub>a</sub>×9.81',          r.G.toFixed(0)+' N',   'rc2');
+    html += row('α₂（驱动桥载荷分配比）',          p.alpha.toFixed(2),    'rc2');
+    html += row('G₂ = G×α₂',                       r.G2.toFixed(0)+' N',  'rc2');
+    html += row("m₂'（轴荷转移系数）",              p.m2.toFixed(2),       'rc2');
+    html += row('φ（附着系数）',                    p.phi.toFixed(2),      'rc2');
+    html += row('r<sub>r</sub>（滚动半径）',         p.rr.toFixed(3)+' m',  'rc2');
+    html += row('i<sub>m</sub>（轮边减速比）',       p.im.toFixed(1),       'rc2');
+    html += row('η<sub>m</sub>（从动轮到轮效率）',  p.etam.toFixed(2),     'rc2');
+    html += rowSep();
+    html += row("T<sub>cs</sub> = G₂·m₂'·φ·r<sub>r</sub> / (i<sub>m</sub>·η<sub>m</sub>)",
+      r.Tcs.toFixed(0)+' N·m', 'rhl');
+  } else if (PROC === 2) {
+    // Tcl derivation
+    html += row('m<sub>a</sub>（满载质量）',         p.ma.toFixed(0)+' kg', 'rc3');
+    html += row('G = m<sub>a</sub>×9.81',            r.G.toFixed(0)+' N',   'rc3');
+    html += row('f<sub>R</sub>（滚动阻力系数）',      p.fR.toFixed(3),       'rc3');
+    html += row('f<sub>H</sub>（坡度阻力系数）',      p.fH.toFixed(3),       'rc3');
+    html += row('f<sub>J</sub>（性能系数）',          p.fJ.toFixed(3),       'rc3');
+    html += row('F<sub>t</sub> = G×(f<sub>R</sub>+f<sub>H</sub>+f<sub>J</sub>)',
+      r.Ft.toFixed(0)+' N', 'rc3');
+    html += row('r<sub>r</sub>（滚动半径）',           p.rr.toFixed(3)+' m',  'rc3');
+    html += row('i<sub>m</sub>（轮边减速比）',         p.im.toFixed(1),       'rc3');
+    html += row('η<sub>m</sub>（从动轮到轮效率）',    p.etam.toFixed(2),     'rc3');
+    html += row('n（驱动桥数）',                      p.n,                   'rc3');
+    html += rowSep();
+    html += row('T<sub>cl</sub> = F<sub>t</sub>·r<sub>r</sub> / (i<sub>m</sub>·η<sub>m</sub>·n)',
+      r.Tcl.toFixed(0)+' N·m', 'rhl');
+  } else {
+    // Tc pinion derivation
+    var ctrl = r.Tce <= r.Tcs ? 'T<sub>ce</sub>' : 'T<sub>cs</sub>';
+    html += row('T<sub>c,从</sub> = min(T<sub>ce</sub>, T<sub>cs</sub>)', r.TcD.toFixed(0)+' N·m', 'rc4');
+    html += row('齿轮副类型', gearType==='spiral'?'弧齿锥齿轮':'双曲面齿轮', 'rc4');
+    var etaGRule = '';
+    if (gearType === 'spiral') {
+      etaGRule = 'η<sub>G</sub> = 0.95（弧齿锥固定值）';
+    } else {
+      etaGRule = p.i0 > 6
+        ? 'η<sub>G</sub> = 0.85（双曲面，i₀='+p.i0.toFixed(2)+'&gt;6）'
+        : 'η<sub>G</sub> = 0.90（双曲面，i₀='+p.i0.toFixed(2)+'≤6）';
+    }
+    html += row(etaGRule, (r.etaG*100).toFixed(0)+'%', 'rc4');
+    html += row('i₀（主减速比）', p.i0.toFixed(2), 'rc4');
+    html += rowSep();
+    html += row('T<sub>c</sub> = T<sub>c,从</sub> / (i₀·η<sub>G</sub>)',
+      r.Tc.toFixed(0)+' N·m', 'rhl');
+  }
+  document.getElementById('proc_body').innerHTML = html;
+}
+
+function row(label, val, cls) {
+  return '<div class="eq">' + label + '</div><div class="rv ' + cls + '">' + val + '</div>';
+}
+function rowSep() {
+  return '<div style="border-top:1px dashed var(--g5);margin:5px 0;grid-column:1/-1"></div>';
+}
+
+// ── Sensitivity chart ──────────────────────────────────────────────────────
+var TABS = [
+  {key:'i1',  label:'i₁ 对载荷',   min:1.0,  max:8.0,  step:0.1,  unit:'',     desc:'最低档传动比 i₁ 越大 → Tce 正比增大；Tcs 和 Tcl 不受 i₁ 影响。超过临界值后控制工况从附着切换为发动机工况'},
+  {key:'phi', label:'φ 对载荷',    min:0.3,  max:1.0,  step:0.05, unit:'',     desc:'附着系数 φ 越大 → Tcs 正比增大；Tce 不受 φ 影响。高 φ（干沥青）时打滑工况可能超过发动机工况成为控制工况'},
+  {key:'Te',  label:'Temax 对载荷', min:50,   max:1200, step:10,   unit:'N·m',  desc:'发动机最大转矩 Temax 越大 → Tce 正比增大；Tcs 和 Tcl 不受影响'},
+  {key:'i0',  label:'i₀ 对载荷',   min:2.0,  max:9.0,  step:0.1,  unit:'',     desc:'i₀ 越大 → Tce 正比增大；Tcs 不受 i₀ 影响；主动轮 Tc 随 i₀ 增大而减小（除以 i₀）。注意双曲面 i₀>6 时 ηG 由 0.90 跳变为 0.85'},
+  {key:'kd',  label:'kd 对载荷',   min:1.0,  max:4.0,  step:0.1,  unit:'',     desc:'液力变矩器变矩系数 kd 越大 → Tce 越大（正比）；AT车型 kd 较大，MT 取 1.0'},
+  {key:'eta', label:'η 对载荷',    min:0.70, max:0.98, step:0.01, unit:'',     desc:'传动效率 η 越高 → Tce 越大（正比）；η 通常取 0.85~0.95'},
+];
+
+function buildTabRow() {
+  var html = '';
+  TABS.forEach(function(t, i) {
+    html += '<div class="tab' + (i===0?' active':'') + '" onclick="switchTab('+i+')">'+t.label+'</div>';
+  });
+  document.getElementById('tabRow').innerHTML = html;
+}
+
+function switchTab(i) {
+  TAB = i;
+  document.querySelectorAll('.tab').forEach(function(t, j) {
+    t.className = 'tab' + (j===i ? ' active' : '');
+  });
+  drawChart();
+}
+
+function drawChart() {
+  var cfg    = TABS[TAB];
+  var canvas = document.getElementById('mainChart');
+  var W      = canvas.parentElement.clientWidth - 32;
+  canvas.width = W; canvas.height = 290;
+  var ctx    = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, 290);
+
+  var steps = 100, range = cfg.max - cfg.min;
+  var xs=[],yTce=[],yTcs=[],yTcl=[],yTcD=[],yTc=[];
+  for (var i=0; i<=steps; i++) {
+    var xv = cfg.min + range*i/steps;
+    xs.push(xv);
+    var q = Object.assign({}, P);
+    q[cfg.key] = xv;
+    var r2 = calcAll(q, gearType);
+    yTce.push(r2.Tce); yTcs.push(r2.Tcs);
+    yTcl.push(r2.Tcl); yTcD.push(r2.TcD); yTc.push(r2.Tc);
+  }
+
+  var pad = {top:36, right:20, bottom:50, left:78};
+  var cw = W - pad.left - pad.right, ch = 290 - pad.top - pad.bottom;
+  var allY = yTce.concat(yTcs).concat(yTcl).concat(yTc);
+  var yMax = Math.max.apply(null,allY)*1.15, yMin=0;
+
+  function px(xv){return pad.left+(xv-cfg.min)/range*cw;}
+  function py(yv){return pad.top+(1-(yv-yMin)/(yMax-yMin))*ch;}
+
+  // Grid
+  for (var gi=0; gi<=5; gi++) {
+    var gv=yMin+(yMax-yMin)*gi/5, gy=py(gv);
+    ctx.strokeStyle='#e0e8ef'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.left,gy); ctx.lineTo(pad.left+cw,gy); ctx.stroke();
+    ctx.fillStyle='#8fa3b5'; ctx.font='14px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(Math.round(gv), pad.left-5, gy+4);
+  }
+  for (var xi=0; xi<=6; xi++) {
+    var xv2=cfg.min+range*xi/6, gx=px(xv2);
+    ctx.strokeStyle='#e0e8ef'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx,pad.top); ctx.lineTo(gx,pad.top+ch); ctx.stroke();
+    ctx.fillStyle='#8fa3b5'; ctx.font='14px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(xv2.toFixed(cfg.step<0.05?2:cfg.step<1?1:0), gx, pad.top+ch+16);
+  }
+
+  // Shade: engine-controlled region (Tce < Tcs) vs slip-controlled
+  for (var si=0; si<xs.length-1; si++) {
+    ctx.fillStyle = yTce[si]<yTcs[si] ? 'rgba(26,95,168,0.05)' : 'rgba(197,90,17,0.05)';
+    ctx.fillRect(px(xs[si]), pad.top, px(xs[si+1])-px(xs[si]), ch);
+  }
+
+  // Curves
+  var curves = [
+    {y:yTce, color:'#1a5fa8', label:'Tce（发动机工况）', dash:[]},
+    {y:yTcs, color:'#c55a11', label:'Tcs（打滑工况）',   dash:[]},
+    {y:yTcl, color:'#0e7490', label:'Tcl（日常行驶）',   dash:[5,3]},
+    {y:yTcD, color:'#1a7a3c', label:'Tc,从=min（设计）', dash:[4,3]},
+    {y:yTc,  color:'#6b21a8', label:'Tc（主动轮）',      dash:[3,2]},
+  ];
+  curves.forEach(function(cv){
+    ctx.strokeStyle=cv.color; ctx.lineWidth=cv.y===yTcD?3:2;
+    ctx.setLineDash(cv.dash);
+    ctx.beginPath();
+    xs.forEach(function(xv3,i3){
+      if(i3===0) ctx.moveTo(px(xv3),py(cv.y[i3]));
+      else ctx.lineTo(px(xv3),py(cv.y[i3]));
+    });
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+
+  // Current value marker
+  var curX = P[cfg.key];
+  if (curX >= cfg.min && curX <= cfg.max) {
+    var curQ = Object.assign({},P); curQ[cfg.key]=curX;
+    var curR = calcAll(curQ, gearType);
+    [{y:curR.Tce,c:'#1a5fa8'},{y:curR.Tcs,c:'#c55a11'},{y:curR.Tc,c:'#6b21a8'}].forEach(function(d){
+      ctx.fillStyle=d.c;
+      ctx.beginPath(); ctx.arc(px(curX),py(d.y),5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(px(curX),py(d.y),2,0,Math.PI*2); ctx.fill();
+    });
+    ctx.strokeStyle='rgba(0,0,0,.18)'; ctx.lineWidth=1.2; ctx.setLineDash([3,2]);
+    ctx.beginPath(); ctx.moveTo(px(curX),pad.top); ctx.lineTo(px(curX),pad.top+ch); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Axes
+  ctx.strokeStyle='#8fa3b5'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+ch);
+  ctx.lineTo(pad.left+cw,pad.top+ch); ctx.stroke();
+  ctx.fillStyle='#374a5c'; ctx.font='bold 15px sans-serif'; ctx.textAlign='center';
+  ctx.fillText(cfg.key+(cfg.unit?' ('+cfg.unit+')':''), pad.left+cw/2, 290-5);
+  ctx.save(); ctx.translate(14,pad.top+ch/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('计算载荷 (N·m)', 0, 0); ctx.restore();
+  ctx.fillStyle='#1a3a5c'; ctx.font='bold 16px sans-serif'; ctx.textAlign='center';
+  ctx.fillText(cfg.label+'的影响（'+gearType+'）', pad.left+cw/2, pad.top-12);
+
+  // Legend
+  var lx = pad.left;
+  curves.forEach(function(cv){
+    ctx.strokeStyle=cv.color; ctx.lineWidth=2.5;
+    ctx.setLineDash(cv.dash);
+    ctx.beginPath(); ctx.moveTo(lx,pad.top+ch+34); ctx.lineTo(lx+16,pad.top+ch+34); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#374a5c'; ctx.font='13px sans-serif'; ctx.textAlign='left';
+    ctx.fillText(cv.label, lx+20, pad.top+ch+38);
+    lx += ctx.measureText(cv.label).width + 42;
+    if(lx > W-100) lx = pad.left; // wrap if needed (shouldn't happen)
+  });
+
+  document.getElementById('chartNote').textContent = cfg.desc;
+}
+
+// ── Comparison table ───────────────────────────────────────────────────────
+var SCENARIOS = [
+  {label:'乘用车 FR',  i1:4.5,  i0:3.90, phi:0.85, cur:false},
+  {label:'乘用车 SUV', i1:5.0,  i0:4.10, phi:0.85, cur:false},
+  {label:'商用车 轻型',i1:5.5,  i0:5.30, phi:0.80, cur:false},
+  {label:'商用车 重型',i1:6.0,  i0:6.50, phi:0.75, cur:false},
+  {label:'越野车 4WD', i1:7.0,  i0:4.70, phi:0.65, cur:false},
+  {label:'当前参数',   i1:-1,   i0:-1,   phi:-1,   cur:true },
+];
+
+function renderTable() {
+  var html = '';
+  SCENARIOS.forEach(function(s){
+    var q;
+    if (s.cur) {
+      q = Object.assign({}, P);
+    } else {
+      q = Object.assign({}, P, {i1:s.i1, i0:s.i0, phi:s.phi});
+    }
+    var r2 = calcAll(q, gearType);
+    var ctrl = r2.Tce <= r2.Tcs ? '发动机' : '打滑附着';
+    var cc   = r2.Tce <= r2.Tcs ? 't1' : 't2';
+    var cur  = s.cur ? ' cur' : '';
+    html += '<tr>';
+    html += '<td class="'+cur+'">'+s.label+'</td>';
+    html += '<td class="'+cur+'">'+gearType+'</td>';
+    html += '<td class="'+cur+'">'+(s.cur?P.i1.toFixed(1):s.i1)+'</td>';
+    html += '<td class="'+cur+'">'+(s.cur?P.i0.toFixed(2):s.i0)+'</td>';
+    html += '<td class="'+cur+'">'+(s.cur?P.phi.toFixed(2):s.phi)+'</td>';
+    html += '<td class="t1'+cur+'">'+r2.Tce.toFixed(0)+'</td>';
+    html += '<td class="t2'+cur+'">'+r2.Tcs.toFixed(0)+'</td>';
+    html += '<td class="t3'+cur+'">'+r2.Tcl.toFixed(0)+'</td>';
+    html += '<td class="tdes'+cur+'">'+r2.TcD.toFixed(0)+'</td>';
+    html += '<td class="t4'+cur+'">'+r2.Tc.toFixed(0)+'</td>';
+    html += '<td class="'+cc+cur+'">'+ctrl+'</td>';
+    html += '</tr>';
+  });
+  document.getElementById('cmpBody').innerHTML = html;
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+buildTabRow();
+window.addEventListener('resize', function(){ drawChart(); });
+compute();
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+if (e.key === 'F12' || 
+(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+(e.ctrlKey && e.key === 'U') ||
+(e.ctrlKey && e.key === 'S')) {
+e.preventDefault();
+return false;
+}
+});
+
+</script>
+<script>
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.key === 'U') ||
+        (e.ctrlKey && e.key === 'S')) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
+
+</body>
+</html>
